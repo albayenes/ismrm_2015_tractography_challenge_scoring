@@ -52,7 +52,7 @@ def _get_tracts_over_grid(tract_fname, ref_anat_fname, tract_attributes,
             transformed_s = np.dot(c_[s.streamline, np.ones([s.streamline.shape[0], 1], dtype='<f4')],
                                    world_to_index_affine)[:, :-1] + shift
             yield transformed_s
-    elif isinstance(tracts_file, tc.formats.trk.TRK):
+    elif isinstance(tracts_file, TrkFile):
          # Use nb.trackvis to read directly in correct space
          # TODO this should be made more robust, using
          # all fields in header.

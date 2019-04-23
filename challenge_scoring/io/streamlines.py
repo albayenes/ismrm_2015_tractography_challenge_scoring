@@ -11,16 +11,6 @@ import tractconverter as tc
 from tractconverter.formats.tck import TCK
 
 
-def format_needs_orientation(tract_fname):
-    tracts_format = tc.detect_format(tract_fname)
-    tracts_file = tracts_format(tract_fname)
-
-    if isinstance(tracts_file, tc.formats.vtk.VTK):
-        return True
-
-    return False
-
-
 def guess_orientation(tract_fname):
     tracts_format = tc.detect_format(tract_fname)
     tracts_file = tracts_format(tract_fname)

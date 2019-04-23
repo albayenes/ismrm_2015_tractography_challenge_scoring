@@ -90,8 +90,8 @@ def get_tracts_voxel_space_for_dipy(tract_fname, ref_anat_fname, tract_attribute
                                  False)
 
 
-def save_tracts_tck_from_dipy_voxel_space(tract_outobj, ref_anat_fname,
-                                          tracts):
+def save_tracts_tck_from_dipy_voxel_space(ref_anat_fname,
+                                          tracts, output_filename):
     # TODO validate that tract_outobj is a TCK file.
     # Get information on the supporting anatomy
     ref_img = nb.load(ref_anat_fname)
@@ -105,7 +105,9 @@ def save_tracts_tck_from_dipy_voxel_space(tract_outobj, ref_anat_fname,
     transformed = [np.dot(c_[s, np.ones([s.shape[0], 1], dtype='<f4')],
                           index_to_world_affine)[:, :-1] for s in tracts]
 
-    tract_outobj += transformed
+    transformed_tractogram = Tractogram(streamlines=transformed, affine_to_rasmm=np.eye(4))
+
+    nb.streamlines.save(transformed_tractogram, output_filename)
 
 
 def save_valid_connections(extracted_vb_info, streamlines,
@@ -116,7 +118,7 @@ def save_valid_connections(extracted_vb_info, streamlines,
         return
 
     full_vcs = []
-    for bundle_name, bundle_info in extracted_vb_info.iteritems():
+    for bundle_name, bundle_info in extracted_vb_info.items():
         if bundle_info['nb_streamlines'] > 0:
             out_fname = os.path.join(segmented_out_dir, basename +
                                      '_VB_{0}.tck'.format(bundle_name))
@@ -128,16 +130,12 @@ def save_valid_connections(extracted_vb_info, streamlines,
                 full_vcs.extend(vc_strl)
 
             if save_vbs:
-                vb_f = TCK.create(out_fname)
-                save_tracts_tck_from_dipy_voxel_space(vb_f, ref_anat_fname, vc_strl)
+                save_tracts_tck_from_dipy_voxel_space(ref_anat_fname, vc_strl, out_fname)
 
     if save_full_vc and len(full_vcs):
         out_name = os.path.join(segmented_out_dir, basename + '_VC.tck')
-        tract_file = TCK.create(out_name)
-
-        save_tracts_tck_from_dipy_voxel_space(tract_file,
-                                              ref_anat_fname,
-                                              full_vcs)
+        save_tracts_tck_from_dipy_voxel_space(ref_anat_fname,
+                                              full_vcs, out_name)
 
 
 def save_invalid_connections(ib_info, streamlines, ic_clusters,
@@ -163,17 +161,13 @@ def save_invalid_connections(ib_info, streamlines, ic_clusters,
                                      base_name +
                                      '_IB_{0}_{1}.tck'.format(k[0], k[1]))
 
-            ib_f = TCK.create(out_fname)
-            save_tracts_tck_from_dipy_voxel_space(ib_f, ref_anat_fname,
-                                                  out_strl)
+            save_tracts_tck_from_dipy_voxel_space(ref_anat_fname,
+                                                  out_strl, out_fname)
 
         if save_full_ic:
             full_ic.extend(out_strl)
 
     if save_full_ic and len(full_ic):
         out_name = os.path.join(out_segmented_dir, base_name + '_IC.tck')
-        tract_file = TCK.create(out_name)
-
-        save_tracts_tck_from_dipy_voxel_space(tract_file,
-                                              ref_anat_fname,
-                                              full_ic)
+        save_tracts_tck_from_dipy_voxel_space(ref_anat_fname,
+                                              full_ic, out_name)

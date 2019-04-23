@@ -149,15 +149,11 @@ def main():
 
     # Check and compute orientation attribute for the submitted tractogram
     tract_attribute = {'orientation': 'unknown'}
-    if format_needs_orientation(tractogram):
-        if not args.orientation:
-            parser.error('--orientation is needed for your tractogram format')
-        tract_attribute['orientation'] = args.orientation
-    else:
-        if args.orientation:
-            logging.warn('--orientation was provided but not needed. '
-                         'Will be discarded.')
-        tract_attribute['orientation'] = guess_orientation(tractogram)
+
+    if args.orientation:
+        logging.warn('--orientation was provided but not needed. '
+                     'Will be discarded.')
+    tract_attribute['orientation'] = guess_orientation(tractogram)
 
     scores = score_submission(tractogram, tract_attribute,
                               base_dir, basic_bundles_attribs,

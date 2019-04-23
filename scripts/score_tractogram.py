@@ -62,10 +62,6 @@ def buildArgsParser():
                    metavar='OUT_DIR',  type=str,
                    help='directory where to send score files')
 
-    p.add_argument('--orientation', action='store',
-                   choices=['RAS', 'LPS'],
-                   help='Orientation of the streamlines file. Needed for VTK.')
-
     p.add_argument('--save_full_vc', action='store_true',
                    help='save one file containing all VCs')
     p.add_argument('--save_full_ic', action='store_true',
@@ -150,9 +146,6 @@ def main():
     # Check and compute orientation attribute for the submitted tractogram
     tract_attribute = {'orientation': 'unknown'}
 
-    if args.orientation:
-        logging.warn('--orientation was provided but not needed. '
-                     'Will be discarded.')
     tract_attribute['orientation'] = guess_orientation(tractogram)
 
     scores = score_submission(tractogram, tract_attribute,

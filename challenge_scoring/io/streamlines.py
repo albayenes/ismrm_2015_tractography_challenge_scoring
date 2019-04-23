@@ -37,21 +37,6 @@ def _get_tracts_over_grid(tract_fname, ref_anat_fname, tract_attributes,
 
     index_to_world_affine = ref_img.get_header().get_best_affine()
 
-    if isinstance(tracts_file, tc.formats.vtk.VTK):
-        # For VTK files, we need to check the orientation.
-        # Considered to be in world space. Use the orientation to correct the
-        # affine to bring back to voxel.
-        # Since the affine from Nifti goes from voxel to RAS, we need to
-        # *-1 the 2 first rows if we are in LPS.
-        orientation = tract_attributes.get("orientation", None)
-        if orientation is None:
-            raise AttributeError('Missing the "orientation" attribute for VTK')
-        elif orientation == "NOT_FOUND":
-            raise ValueError('Invalid value of "NOT_FOUND" for orientation')
-        elif orientation == "LPS":
-            index_to_world_affine[0,:] *= -1.0
-            index_to_world_affine[1,:] *= -1.0
-
     # Transposed for efficient computations later on.
     index_to_world_affine = index_to_world_affine.T.astype('<f4')
     world_to_index_affine = linalg.inv(index_to_world_affine)

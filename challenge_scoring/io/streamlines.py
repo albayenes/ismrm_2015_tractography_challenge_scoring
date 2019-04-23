@@ -7,8 +7,10 @@ import nibabel as nb
 import numpy as np
 from numpy import linalg
 from numpy.lib.index_tricks import c_
-import tractconverter as tc
-from tractconverter.formats.tck import TCK
+import nibabel.streamlines as strmlines
+from nibabel.streamlines.tck import TckFile
+from nibabel.streamlines.trk import TrkFile
+from nibabel.streamlines import Tractogram
 
 
 def guess_orientation(tract_fname):

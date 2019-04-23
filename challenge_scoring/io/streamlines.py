@@ -42,15 +42,14 @@ def _get_tracts_over_grid(tract_fname, ref_anat_fname, tract_attributes,
     world_to_index_affine = linalg.inv(index_to_world_affine)
 
     # Load tracts
-    if isinstance(tracts_file, tc.formats.tck.TCK)\
-        or isinstance(tracts_file, tc.formats.vtk.VTK):
+    if isinstance(tracts_file, TckFile):
         if start_at_corner:
             shift = 0.5
         else:
             shift = 0.0
 
-        for s in tracts_file:
-            transformed_s = np.dot(c_[s, np.ones([s.shape[0], 1], dtype='<f4')],
+        for s in tracts_file.tractogram:
+            transformed_s = np.dot(c_[s.streamline, np.ones([s.streamline.shape[0], 1], dtype='<f4')],
                                    world_to_index_affine)[:, :-1] + shift
             yield transformed_s
     elif isinstance(tracts_file, tc.formats.trk.TRK):
